@@ -4,6 +4,7 @@ import sqliteImage from "../assets/sqlite-icon.png";
 import mariadbImage from "../assets/mariadb-icon.png";
 import mssqlImage from "../assets/mssql-icon.png";
 import oraclesqlImage from "../assets/oraclesql-icon.png";
+import cubableImage from "../assets/cubable.png";
 import i18n from "../i18n/i18n";
 import { DB } from "./constants";
 
@@ -57,6 +58,13 @@ export const databases = new Proxy(
       label: DB.GENERIC,
       image: null,
       description: i18n.t("generic_description"),
+      hasTypes: true,
+    },
+    [DB.CUBABLE]: {
+      name: "Cubable",
+      label: DB.CUBABLE,
+      image: cubableImage,
+      description: i18n.t("Linh hoạt -  Tùy biến"),
       hasTypes: true,
     },
   },

@@ -1,11 +1,12 @@
-import { Collapse, Button } from "@douyinfe/semi-ui";
-import { IconPlus } from "@douyinfe/semi-icons";
+import { Collapse, Button, Modal, Input, Spin } from "@douyinfe/semi-ui";
+import { IconPlus, IconUser } from "@douyinfe/semi-icons";
 import { useSelect, useDiagram } from "../../../hooks";
 import { ObjectType } from "../../../data/constants";
 import SearchBar from "./SearchBar";
 import Empty from "../Empty";
 import TableInfo from "./TableInfo";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 export default function TablesTab() {
   const { tables, addTable } = useDiagram();
@@ -16,7 +17,7 @@ export default function TablesTab() {
     <>
       <div className="flex gap-2">
         <SearchBar tables={tables} />
-        <div>
+        <div className="flex gap-2">
           <Button icon={<IconPlus />} block onClick={() => addTable()}>
             {t("add_table")}
           </Button>

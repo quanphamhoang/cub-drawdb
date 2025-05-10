@@ -20,6 +20,8 @@ export function exportSQL(diagram) {
       return toMSSQL(diagram);
     case DB.ORACLESQL:
       return toOracleSQL(diagram);
+    case DB.CUBABLE:
+      return toCubable(diagram);
     default:
       return "";
   }

@@ -92,6 +92,7 @@ export const DB = {
   MARIADB: "mariadb",
   ORACLESQL: "oraclesql",
   GENERIC: "generic",
+  CUBABLE: "CUBABLE",
 };
 
 export const IMPORT_FROM = {

@@ -214,6 +214,10 @@ const vi = {
     edit_relationship: "{{extra}} Chỉnh sửa quan hệ {{refName}}",
     delete_relationship: "Xóa quan hệ {{refName}}",
     not_found: "Không tìm thấy",
+    "AI Generate": "Tạo bằng AI",
+    "AI Table Generator": "Tạo bảng bằng AI",
+    "Enter your prompt to generate database tables...": "Nhập mô tả để tạo các bảng cơ sở dữ liệu...",
+    Generate: "Tạo",
   },
 };
 

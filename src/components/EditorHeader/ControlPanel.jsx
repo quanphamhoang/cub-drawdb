@@ -78,6 +78,7 @@ import { IdContext } from "../Workspace";
 import { socials } from "../../data/socials";
 import { toDBML } from "../../utils/exportAs/dbml";
 import { exportSavedData } from "../../utils/exportSavedData";
+import { dbToTypes } from "../../data/datatypes";
 
 export default function ControlPanel({
   diagramId,
@@ -1070,7 +1071,13 @@ export default function ControlPanel({
               setModal(MODAL.CODE);
               const result = JSON.stringify(
                 {
-                  tables: tables,
+                  tables: tables.map(table => ({
+                    ...table,
+                    fields: table.fields.map(field => ({
+                      ...field,
+                      ...(database === DB.CUBABLE && { dataType: dbToTypes[DB.CUBABLE][field.type]?.dataType })
+                    }))
+                  })),
                   relationships: relationships,
                   notes: notes,
                   subjectAreas: areas,

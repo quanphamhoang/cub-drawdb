@@ -251,6 +251,10 @@ const en = {
     bulk_update: "Bulk update",
     multiselect: "Multiselect",
     export_saved_data: "Export saved data",
+    "AI Generate": "AI Generate",
+    "AI Table Generator": "AI Table Generator",
+    "Enter your prompt to generate database tables...": "Enter your prompt to generate database tables...",
+    Generate: "Generate",
   },
 };
 

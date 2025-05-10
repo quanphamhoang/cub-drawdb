@@ -38,11 +38,12 @@ export function isFunction(str) {
 }
 
 export function areFieldsCompatible(db, field1, field2) {
-  const same = field1.type === field2.type;
-  if (dbToTypes[db][field1.type].compatibleWith) {
-    return (
-      dbToTypes[db][field1.type].compatibleWith.includes(field2.type) || same
-    );
-  }
-  return same;
+  // const same = field1.type === field2.type;
+  // if (dbToTypes[db][field1.type].compatibleWith) {
+  //   return (
+  //     dbToTypes[db][field1.type].compatibleWith.includes(field2.type) || same
+  //   );
+  // }
+  // return same;
+  return true;
 }

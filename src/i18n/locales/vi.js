@@ -113,7 +113,7 @@ const vi = {
     check: "Kiểm tra biểu thức",
     this_will_appear_as_is:
       "*Điều này sẽ xuất hiện trong đoạn lệnh được tạo như hiện tại.",
-    comment: "Bình luận",
+    comment: "Mô tả",
     add_field: "Thêm trường",
     values: "Giá trị",
     size: "Kích cỡ",

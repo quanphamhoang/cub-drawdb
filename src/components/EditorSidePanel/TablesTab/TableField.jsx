@@ -91,7 +91,7 @@ export default function TableField({ data, tid, index }) {
             const incr =
               data.increment && !!dbToTypes[database][value].canIncrement;
 
-            if (value === "ENUM" || value === "SET") {
+            if (value === "ENUM" || value === "SET" || value === "DROPDOWN") {
               updateField(tid, index, {
                 type: value,
                 default: "",

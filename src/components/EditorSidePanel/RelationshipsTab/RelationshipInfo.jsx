@@ -6,6 +6,7 @@ import {
   Popover,
   Table,
   Input,
+  Checkbox,
 } from "@douyinfe/semi-ui";
 import {
   IconDeleteStroked,
@@ -21,16 +22,16 @@ import {
 import { useDiagram, useUndoRedo } from "../../../hooks";
 import i18n from "../../../i18n/i18n";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const columns = [
   {
-    title: i18n.t("primary"),
-    dataIndex: "primary",
+    title: i18n.t("from"),
+    dataIndex: "from",
   },
   {
-    title: i18n.t("foreign"),
-    dataIndex: "foreign",
+    title: i18n.t("to"),
+    dataIndex: "to",
   },
 ];
 
@@ -40,6 +41,15 @@ export default function RelationshipInfo({ data }) {
     useDiagram();
   const { t } = useTranslation();
   const [editField, setEditField] = useState({});
+  const [isMultiple, setIsMultiple] = useState(data.name.includes("(1:n)"));
+
+  useEffect(() => {
+    if (data.cardinality === Cardinality.TWO_WAY) {
+      setIsMultiple(true);
+    } else {
+      setIsMultiple(data.name.includes("(1:n)"));
+    }
+  }, [data.cardinality, data.name]);
 
   const swapKeys = () => {
     setUndoStack((prev) => [
@@ -72,9 +82,7 @@ export default function RelationshipInfo({ data }) {
         idx === data.id
           ? {
               ...e,
-              name: `fk_${tables[e.endTableId].name}_${
-                tables[e.endTableId].fields[e.endFieldId].name
-              }_${tables[e.startTableId].name}`,
+              name: t(e.cardinality),
               startTableId: e.endTableId,
               startFieldId: e.endFieldId,
               endTableId: e.startTableId,
@@ -86,14 +94,31 @@ export default function RelationshipInfo({ data }) {
   };
 
   const changeCardinality = (value) => {
+    const isTwoWay = value === Cardinality.TWO_WAY;
+    const isRefLookup = value === Cardinality.REF_LOOKUP;
+    const newIsMultiple = isTwoWay ? true : false;
+    setIsMultiple(newIsMultiple);
+    
+    let newName;
+    if (isTwoWay) {
+      newName = "2-way (n:n)";
+    } else if (isRefLookup) {
+      newName = "ref-lookup";
+    } else {
+      newName = newIsMultiple ? "1-way (1:n)" : "1-way (1:1)";
+    }
+    
     setUndoStack((prev) => [
       ...prev,
       {
         action: Action.EDIT,
         element: ObjectType.RELATIONSHIP,
         rid: data.id,
-        undo: { cardinality: data.cardinality },
-        redo: { cardinality: value },
+        undo: { cardinality: data.cardinality, name: data.name },
+        redo: { 
+          cardinality: value,
+          name: newName
+        },
         message: t("edit_relationship", {
           refName: data.name,
           extra: "[cardinality]",
@@ -103,7 +128,39 @@ export default function RelationshipInfo({ data }) {
     setRedoStack([]);
     setRelationships((prev) =>
       prev.map((e, idx) =>
-        idx === data.id ? { ...e, cardinality: value } : e,
+        idx === data.id ? { 
+          ...e, 
+          cardinality: value,
+          name: newName
+        } : e,
+      ),
+    );
+  };
+
+  const handleMultipleChange = (checked) => {
+    if (data.cardinality === Cardinality.TWO_WAY || data.cardinality === Cardinality.REF_LOOKUP) return;
+    
+    setIsMultiple(checked);
+    const newName = checked ? "1-way (1:n)" : "1-way (1:1)";
+    
+    setUndoStack((prev) => [
+      ...prev,
+      {
+        action: Action.EDIT,
+        element: ObjectType.RELATIONSHIP,
+        rid: data.id,
+        undo: { name: data.name },
+        redo: { name: newName },
+        message: t("edit_relationship", {
+          refName: newName,
+          extra: "[multiple]",
+        }),
+      },
+    ]);
+    setRedoStack([]);
+    setRelationships((prev) =>
+      prev.map((e, idx) =>
+        idx === data.id ? { ...e, name: newName } : e,
       ),
     );
   };
@@ -164,11 +221,11 @@ export default function RelationshipInfo({ data }) {
       </div>
       <div className="flex justify-between items-center mb-3">
         <div className="me-3">
-          <span className="font-semibold">{t("primary")}: </span>
+          <span className="font-semibold">{t("from")}: </span>
           {tables[data.endTableId].name}
         </div>
         <div className="mx-1">
-          <span className="font-semibold">{t("foreign")}: </span>
+          <span className="font-semibold">{t("to")}: </span>
           {tables[data.startTableId].name}
         </div>
         <div className="ms-1">
@@ -222,6 +279,15 @@ export default function RelationshipInfo({ data }) {
         className="w-full"
         onChange={changeCardinality}
       />
+      <div className="mt-2">
+        <Checkbox
+          checked={isMultiple}
+          disabled={data.cardinality === Cardinality.TWO_WAY || data.cardinality === Cardinality.REF_LOOKUP}
+          onChange={handleMultipleChange}
+        >
+          {t("multiple_selection")}
+        </Checkbox>
+      </div>
       <Row gutter={6} className="my-3">
         <Col span={12}>
           <div className="font-semibold">{t("on_update")}: </div>

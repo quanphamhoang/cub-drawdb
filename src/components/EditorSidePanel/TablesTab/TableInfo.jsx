@@ -151,36 +151,6 @@ export default function TableInfo({ data }) {
           <TableField data={f} tid={data.id} index={j} />
         </div>
       ))}
-      {data.indices.length > 0 && (
-        <Card
-          bodyStyle={{ padding: "4px" }}
-          style={{ marginTop: "12px", marginBottom: "12px" }}
-          headerLine={false}
-        >
-          <Collapse
-            activeKey={indexActiveKey}
-            keepDOM={false}
-            lazyRender
-            onChange={(itemKey) => setIndexActiveKey(itemKey)}
-            accordion
-          >
-            <Collapse.Panel header={t("indices")} itemKey="1">
-              {data.indices.map((idx, k) => (
-                <IndexDetails
-                  key={"index_" + k}
-                  data={idx}
-                  iid={k}
-                  tid={data.id}
-                  fields={data.fields.map((e) => ({
-                    value: e.name,
-                    label: e.name,
-                  }))}
-                />
-              ))}
-            </Collapse.Panel>
-          </Collapse>
-        </Card>
-      )}
       <Card
         bodyStyle={{ padding: "4px" }}
         style={{ marginTop: "12px", marginBottom: "12px" }}

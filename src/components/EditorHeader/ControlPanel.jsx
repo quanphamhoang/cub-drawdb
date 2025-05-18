@@ -1073,10 +1073,20 @@ export default function ControlPanel({
                 {
                   tables: tables.map(table => ({
                     ...table,
-                    fields: table.fields.map(field => ({
-                      ...field,
-                      ...(database === DB.CUBABLE && { dataType: dbToTypes[DB.CUBABLE][field.type]?.dataType })
-                    }))
+                    fields: table.fields.map(field => {
+                      const fieldData = {
+                        ...field,
+                        ...(database === DB.CUBABLE && { 
+                          dataType: dbToTypes[DB.CUBABLE][field.type]?.dataType,
+                          params: dbToTypes[DB.CUBABLE][field.type]?.getParams?.(field) || {}
+                        })
+                      };
+                      // Remove values if it exists
+                      if (fieldData.values) {
+                        delete fieldData.values;
+                      }
+                      return fieldData;
+                    })
                   })),
                   relationships: relationships,
                   notes: notes,

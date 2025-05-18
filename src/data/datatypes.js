@@ -1,5 +1,6 @@
 import { strHasQuotes } from "../utils/utils";
 import { DB } from "./constants";
+import { ulid } from 'ulid';
 
 const intRegex = /^-?\d*$/;
 const doubleRegex = /^-?\d*.?\d+$/;
@@ -2051,6 +2052,14 @@ export const mariadbTypes = new Proxy(
   },
 );
 
+const dropdownColors = [
+  "#fda29b", "#feb273", "#fec84b", "#86e8ab", "#7dd3fc", 
+  "#a5b4fc", "#c4b5fd", "#f0abfc", "#f9a8d4", "#fda4af"
+];
+
+// Add a Set to track used values
+const usedValues = new Set();
+
 const cubableTypesBase = {
   TEXT: {
     type: "TEXT",
@@ -2060,6 +2069,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 1,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   CHECKBOX: {
     type: "CHECKBOX",
@@ -2069,6 +2079,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 2,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   PARAGRAPH: {
     type: "PARAGRAPH",
@@ -2078,6 +2089,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 3,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   ATTACHMENT: {
     type: "ATTACHMENT",
@@ -2087,6 +2099,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 4,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   DROPDOWN: {
     type: "DROPDOWN",
@@ -2095,7 +2108,46 @@ const cubableTypesBase = {
     hasPrecision: false,
     noDefault: false,
     dataType: 5,
-    checkDefault: (field) => true,
+    checkDefault: (field) => {
+      return field.values.includes(field.default);
+    },
+    hasQuotes: true,
+    getParams: (field) => {
+      const options = field.values.map((name, index) => {
+        // Generate a unique value with ULID
+        let value;
+        do {
+          value = ulid();
+        } while (usedValues.has(value));
+        usedValues.add(value);
+
+        return {
+          name,
+          color: dropdownColors[index % dropdownColors.length],
+          value
+        };
+      });
+
+      const params = {
+        options,
+        isMultipleSelect: field.isMultiple || false
+      };
+
+      // Add reference if field is managed as reference
+      if (field.isReference) {
+        params.reference = {
+          tableID: field.referenceTableId || ulid(),
+          fieldID: field.referenceFieldId || ulid()
+        };
+      }
+
+      // Add allowAddSelections if field is manually managed
+      if (!field.isReference) {
+        params.allowAddSelections = true;
+      }
+
+      return params;
+    }
   },
   NUMBER: {
     type: "NUMBER",
@@ -2105,6 +2157,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 6,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   DATE: {
     type: "DATE",
@@ -2114,6 +2167,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 7,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   PHONE: {
     type: "PHONE",
@@ -2123,6 +2177,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 8,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   WEBSITE: {
     type: "WEBSITE",
@@ -2132,6 +2187,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 9,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   EMAIL: {
     type: "EMAIL",
@@ -2141,6 +2197,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 10,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   CURRENCY: {
     type: "CURRENCY",
@@ -2150,6 +2207,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 11,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   PEOPLE: {
     type: "PEOPLE",
@@ -2159,6 +2217,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 12,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   RATING: {
     type: "RATING",
@@ -2168,6 +2227,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 13,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   PROGRESS: {
     type: "PROGRESS",
@@ -2177,6 +2237,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 14,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   REFERENCE: {
     type: "REFERENCE",
@@ -2186,6 +2247,7 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 15,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   FORMULA: {
     type: "FORMULA",
@@ -2195,6 +2257,17 @@ const cubableTypesBase = {
     noDefault: false,
     dataType: 16,
     checkDefault: (field) => true,
+    getParams: () => ({})
+  },
+  REF_LOOKUP: {
+    type: "REF_LOOKUP",
+    isSized: false,
+    hasCheck: false,
+    hasPrecision: false,
+    noDefault: false,
+    dataType: 17,
+    checkDefault: (field) => true,
+    getParams: () => ({})
   },
   LOOKUP: {
     type: "LOOKUP",
@@ -2202,8 +2275,9 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: false,
-    dataType: 17,
+    dataType: 18,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   LAST_MODIFIED_BY: {
     type: "LAST_MODIFIED_BY",
@@ -2211,8 +2285,9 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: true,
-    dataType: 18,
+    dataType: 19,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   LAST_MODIFIED_TIME: {
     type: "LAST_MODIFIED_TIME",
@@ -2220,8 +2295,9 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: true,
-    dataType: 19,
+    dataType: 20,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   CREATED_BY: {
     type: "CREATED_BY",
@@ -2229,8 +2305,9 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: true,
-    dataType: 20,
+    dataType: 21,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   CREATED_TIME: {
     type: "CREATED_TIME",
@@ -2238,8 +2315,9 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: true,
-    dataType: 21,
+    dataType: 22,
     checkDefault: (field) => true,
+    getParams: () => ({})
   },
   AUTONUMBER: {
     type: "AUTONUMBER",
@@ -2247,9 +2325,10 @@ const cubableTypesBase = {
     hasCheck: false,
     hasPrecision: false,
     noDefault: true,
-    dataType: 22,
+    dataType: 23,
     checkDefault: (field) => true,
-  },
+    getParams: () => ({})
+  }
 };
 
 export const cubableTypes = new Proxy(cubableTypesBase, {

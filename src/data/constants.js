@@ -2,14 +2,14 @@ export const defaultBlue = "#175e7a";
 export const defaultNoteTheme = "#fcf7ac";
 export const darkBgTheme = "#16161A";
 export const tableHeaderHeight = 50;
-export const tableWidth = 220;
+export const tableWidth = 320;
 export const tableFieldHeight = 36;
 export const tableColorStripHeight = 7;
 
 export const Cardinality = {
-  ONE_TO_ONE: "one_to_one",
-  ONE_TO_MANY: "one_to_many",
-  MANY_TO_ONE: "many_to_one",
+  ONE_WAY: "one-way",
+  TWO_WAY: "two-way",
+  REF_LOOKUP: "ref-lookup",
 };
 
 export const Constraint = {

@@ -25,28 +25,11 @@ export default function Relationship({ data }) {
   const pathRef = useRef();
   const labelRef = useRef();
 
-  let cardinalityStart = "1";
-  let cardinalityEnd = "1";
+  let cardinalityStart = "";
+  let cardinalityEnd = "";
 
-  switch (data.cardinality) {
-    // the translated values are to ensure backwards compatibility
-    case t(Cardinality.MANY_TO_ONE):
-    case Cardinality.MANY_TO_ONE:
-      cardinalityStart = "n";
-      cardinalityEnd = "1";
-      break;
-    case t(Cardinality.ONE_TO_MANY):
-    case Cardinality.ONE_TO_MANY:
-      cardinalityStart = "1";
-      cardinalityEnd = "n";
-      break;
-    case t(Cardinality.ONE_TO_ONE):
-    case Cardinality.ONE_TO_ONE:
-      cardinalityStart = "1";
-      cardinalityEnd = "1";
-      break;
-    default:
-      break;
+  if (!data.name) {
+    data.name = `[${tables[data.startTableId].name}] ${t(Cardinality.ONE_WAY)}`;
   }
 
   let cardinalityStartX = 0;
@@ -145,44 +128,6 @@ export default function Relationship({ data }) {
               className="group-hover:fill-sky-700"
             >
               {data.name}
-            </text>
-          </>
-        )}
-        {pathRef.current && settings.showCardinality && (
-          <>
-            <circle
-              cx={cardinalityStartX}
-              cy={cardinalityStartY}
-              r="12"
-              fill="grey"
-              className="group-hover:fill-sky-700"
-            />
-            <text
-              x={cardinalityStartX}
-              y={cardinalityStartY}
-              fill="white"
-              strokeWidth="0.5"
-              textAnchor="middle"
-              alignmentBaseline="middle"
-            >
-              {cardinalityStart}
-            </text>
-            <circle
-              cx={cardinalityEndX}
-              cy={cardinalityEndY}
-              r="12"
-              fill="grey"
-              className="group-hover:fill-sky-700"
-            />
-            <text
-              x={cardinalityEndX}
-              y={cardinalityEndY}
-              fill="white"
-              strokeWidth="0.5"
-              textAnchor="middle"
-              alignmentBaseline="middle"
-            >
-              {cardinalityEnd}
             </text>
           </>
         )}

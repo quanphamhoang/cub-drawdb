@@ -595,8 +595,9 @@ export default function Canvas() {
 
   const handleLinking = () => {
     if (hoveredTable.tableId < 0) return;
-    if (hoveredTable.field < 0) return;
+    if (hoveredTable.field < -1) return;
     if (
+      hoveredTable.field >= 0 &&
       !areFieldsCompatible(
         database,
         tables[linkingLine.startTableId].fields[linkingLine.startFieldId],
@@ -616,12 +617,10 @@ export default function Canvas() {
       ...linkingLine,
       endTableId: hoveredTable.tableId,
       endFieldId: hoveredTable.field,
-      cardinality: Cardinality.ONE_TO_ONE,
+      cardinality: Cardinality.ONE_WAY,
       updateConstraint: Constraint.NONE,
       deleteConstraint: Constraint.NONE,
-      name: `fk_${tables[linkingLine.startTableId].name}_${
-        tables[linkingLine.startTableId].fields[linkingLine.startFieldId].name
-      }_${tables[hoveredTable.tableId].name}`,
+      name: "1-way (1:1)",
       id: relationships.length,
     };
     delete newRelationship.startX;

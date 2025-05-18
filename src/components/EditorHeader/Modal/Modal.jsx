@@ -4,6 +4,7 @@ import {
   Image,
   Toast,
   Modal as SemiUIModal,
+  Button,
 } from "@douyinfe/semi-ui";
 import { DB, MODAL, STATUS } from "../../../data/constants";
 import { useState } from "react";
@@ -39,6 +40,7 @@ import { useTranslation } from "react-i18next";
 import { importSQL } from "../../../utils/importSQL";
 import { databases } from "../../../data/databases";
 import { isRtl } from "../../../i18n/utils/rtl";
+import axios from "axios";
 
 const extensionToLanguage = {
   md: "markdown",
@@ -81,6 +83,10 @@ export default function Modal({
   const [selectedTemplateId, setSelectedTemplateId] = useState(-1);
   const [selectedDiagramId, setSelectedDiagramId] = useState(0);
   const [saveAsTitle, setSaveAsTitle] = useState(title);
+  const [showCubable, setShowCubable] = useState(false);
+  const [cubableToken, setCubableToken] = useState("");
+  const [cubableBaseId, setCubableBaseId] = useState("");
+  const [cubableLoading, setCubableLoading] = useState(false);
 
   const overwriteDiagram = () => {
     setTables(importData.tables);
@@ -210,6 +216,35 @@ export default function Modal({
     newWindow.name = "lt " + id;
   };
 
+  const handleCubableCreate = async () => {
+    setCubableLoading(true);
+    try {
+      await axios.post(
+        "https://testautoboy.futurenow.vn/webhook/b1e6696f-5812-4326-b1f8-021d1845d001",
+        [
+          {
+            "Personal Access Token": cubableToken,
+            baseID: cubableBaseId,
+            "Tables JSON": exportData.data,
+            submittedAt: new Date().toISOString(),
+            formMode: "production",
+            formQueryParameters: {
+              zarsrc: "30",
+              utm_source: "zalo",
+              utm_medium: "zalo",
+              utm_campaign: "zalo"
+            }
+          }
+        ]
+      );
+      Toast.success("Gửi dữ liệu thành công!");
+      setShowCubable(false);
+    } catch (e) {
+      Toast.error("Gửi dữ liệu thất bại!");
+    }
+    setCubableLoading(false);
+  };
+
   const getModalOnOk = async () => {
     switch (modal) {
       case MODAL.IMG:
@@ -333,6 +368,37 @@ export default function Modal({
                 }
                 field="filename"
               />
+              {exportData.extension === "json" && (
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    type="primary"
+                    onClick={() => setShowCubable((v) => !v)}
+                  >
+                    Create with Cubable
+                  </Button>
+                </div>
+              )}
+              {showCubable && (
+                <div className="mt-4 flex flex-col gap-2">
+                  <Input
+                    placeholder="Personal Access Token"
+                    value={cubableToken}
+                    onChange={setCubableToken}
+                  />
+                  <Input
+                    placeholder="BaseID"
+                    value={cubableBaseId}
+                    onChange={setCubableBaseId}
+                  />
+                  <Button
+                    loading={cubableLoading}
+                    type="primary"
+                    onClick={handleCubableCreate}
+                  >
+                    Create
+                  </Button>
+                </div>
+              )}
             </>
           );
         } else {
